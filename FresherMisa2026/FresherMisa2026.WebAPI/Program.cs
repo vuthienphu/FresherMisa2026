@@ -1,4 +1,6 @@
 using FresherMisa2026.WebAPI.Middlewares;
+using FresherMisa2026.Infrastructure;
+using FresherMisa2026.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,9 +13,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+//DI
+builder.Services.AddApplicationDI();
+builder.Services.AddInfrastructure();
+
 var app = builder.Build();
 
-Console.WriteLine(app.Environment.EnvironmentName);
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

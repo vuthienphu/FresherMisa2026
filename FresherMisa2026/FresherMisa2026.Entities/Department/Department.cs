@@ -1,9 +1,11 @@
-﻿using System;
+﻿using FresherMisa2026.Entities.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace FresherMisa2026.Entities.Department
 {
+    [ConfigTable("Department", false, "DepartmentCode")]
     public class Department : BaseModel
     {
         /// <summary>
