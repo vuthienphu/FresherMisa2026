@@ -33,6 +33,7 @@ namespace FresherMisa2026.Infrastructure.Repositories
             return await _dbConnection.QueryAsync<Employee>(query, param, commandType: System.Data.CommandType.Text);
         }
 
+
         public async Task<IEnumerable<Employee>> GetEmployeesByPositionId(Guid positionId)
         {
             string query = SQLExtension.GetQuery("Employee.GetByPositionId");
@@ -41,6 +42,24 @@ namespace FresherMisa2026.Infrastructure.Repositories
                 {"@PositionID", positionId }
             };
             return await _dbConnection.QueryAsync<Employee>(query, param, commandType: System.Data.CommandType.Text);
+        }
+
+        public async Task<IEnumerable<Employee>> FilterEmployees(Guid? departmentId, Guid? positionId, string? gender, decimal? salaryFrom, decimal? salaryTo,DateTime? hireDateFrom,DateTime? hireDateTo)
+        {
+            string query = SQLExtension.GetQuery("Employee.Filter");
+
+            var param = new Dictionary<string, object>
+    {
+        {"@DepartmentID", departmentId},
+        {"@PositionID", positionId},
+        {"@Gender", gender},
+         {"@SalaryFrom", salaryFrom},
+        {"@SalaryTo", salaryTo},
+        {"@HireDateFrom", hireDateFrom},
+        {"@HireDateTo", hireDateTo}
+    };
+
+            return await _dbConnection.QueryAsync<Employee>(query, param);
         }
     }
 }
