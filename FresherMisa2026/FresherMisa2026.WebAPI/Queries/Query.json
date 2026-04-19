@@ -4,5 +4,7 @@
   "Employee.GetByCode": "SELECT * FROM Employee WHERE EmployeeCode=@EmployeeCode",
   "Employee.GetByDepartmentId": "SELECT * FROM Employee WHERE DepartmentID=@DepartmentID AND IsDeleted = FALSE",
   "Employee.GetByPositionId": "SELECT * FROM Employee WHERE PositionID=@PositionID AND IsDeleted = FALSE",
-  "Employee.Filter": "SELECT * FROM Employee WHERE (@DepartmentID IS NULL OR DepartmentID = @DepartmentID) AND (@PositionID IS NULL OR PositionID = @PositionID) AND (@Gender IS NULL OR Gender = @Gender) AND (@SalaryFrom IS NULL OR Salary >= @SalaryFrom)  AND (@SalaryTo IS NULL OR Salary <= @SalaryTo) AND (@HireDateFrom IS NULL OR HireDate >= @HireDateFrom) AND (@HireDateTo IS NULL OR HireDate <= @HireDateTo)"
+  "Employee.Filter": "SELECT * FROM Employee WHERE (@DepartmentID IS NULL OR DepartmentID = @DepartmentID) AND (@PositionID IS NULL OR PositionID = @PositionID) AND (@Gender IS NULL OR Gender = @Gender) AND (@SalaryFrom IS NULL OR Salary >= @SalaryFrom)  AND (@SalaryTo IS NULL OR Salary <= @SalaryTo) AND (@HireDateFrom IS NULL OR HireDate >= @HireDateFrom) AND (@HireDateTo IS NULL OR HireDate <= @HireDateTo)",
+  "Employee.DeparmentCode": "SELECT *FROM employee WHERE DepartmentID IN (SELECT DepartmentID FROM department WHERE DepartmentCode = @DeparmentCode)",
+  "CountEmployee.DeparmentCode": "SELECT COUNT(*) FROM employee WHERE DepartmentID IN (SELECT DepartmentID FROM department WHERE DepartmentCode = @DeparmentCode)"
 }

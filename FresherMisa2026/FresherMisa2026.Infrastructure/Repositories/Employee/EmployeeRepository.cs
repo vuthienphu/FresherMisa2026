@@ -2,6 +2,7 @@ using Dapper;
 using FresherMisa2026.Application.Extensions;
 using FresherMisa2026.Application.Interfaces.Repositories;
 using FresherMisa2026.Entities.Employee;
+using FresherMisa2026.Entities.Position;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 
@@ -60,6 +61,33 @@ namespace FresherMisa2026.Infrastructure.Repositories
     };
 
             return await _dbConnection.QueryAsync<Employee>(query, param);
+        }
+
+      
+        public async Task<IEnumerable<Employee>> GetEmployeesByDeparmentCode(string deparmentCode)
+        {
+            string query = SQLExtension.GetQuery("Employee.DeparmentCode");
+            var param = new Dictionary<string, object>
+            {
+                {"@DeparmentCode", deparmentCode}
+            };
+            return await _dbConnection.QueryAsync<Employee>(query, param, commandType: System.Data.CommandType.Text);
+        }
+
+        public async Task<int> CountEmployeesByDepartmentCode(string deparmentCode)
+        {
+            string query = SQLExtension.GetQuery("CountEmployee.DeparmentCode");
+
+            var param = new Dictionary<string, object>
+    {
+        {"@DeparmentCode", deparmentCode}
+    };
+
+            return await _dbConnection.ExecuteScalarAsync<int>(
+                query,
+                param,
+                commandType: System.Data.CommandType.Text
+            );
         }
     }
 }

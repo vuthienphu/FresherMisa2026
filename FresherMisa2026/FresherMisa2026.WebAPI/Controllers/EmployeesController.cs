@@ -26,7 +26,7 @@ namespace FresherMisa2026.WebAPI.Controllers
             return response;
         }
 
-        [HttpGet("Department/{departmentId}")]
+        [HttpGet("Department/id/{departmentId}")]
         public async Task<ActionResult<ServiceResponse>> GetByDepartmentId(Guid departmentId)
         {
             var response = new ServiceResponse();
@@ -61,6 +61,29 @@ namespace FresherMisa2026.WebAPI.Controllers
 
             response.Data = await _employeeService
                 .FilterEmployeesAsync(departmentId, positionId, gender, salaryFrom, salaryTo, hireDateFrom, hireDateTo);
+
+            response.IsSuccess = true;
+
+            return response;
+        }
+
+        [HttpGet("Department/code/{departmentCode}")]
+        public async Task<ActionResult<ServiceResponse>> GetByDepartmentCode(string departmentCode)
+        {
+            var response = new ServiceResponse();
+            response.Data = await _employeeService.GetEmployeesByDeparmentCodeAsync(departmentCode);
+            response.IsSuccess = true;
+
+            return response;
+        }
+
+        [HttpGet("Department/{departmentCode}/count-employee")]
+        public async Task<ActionResult<ServiceResponse>> CountByDepartmentCode(string departmentCode)
+        {
+            var response = new ServiceResponse();
+
+            response.Data = await _employeeService
+                .CountEmployeesByDepartmentCodeAsync(departmentCode);
 
             response.IsSuccess = true;
 

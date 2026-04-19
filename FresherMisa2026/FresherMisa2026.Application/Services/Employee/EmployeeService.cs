@@ -3,6 +3,7 @@ using FresherMisa2026.Application.Interfaces.Repositories;
 using FresherMisa2026.Application.Interfaces.Services;
 using FresherMisa2026.Entities;
 using FresherMisa2026.Entities.Employee;
+using FresherMisa2026.Entities.Position;
 using System;
 using System.Collections.Generic;
 
@@ -59,6 +60,16 @@ namespace FresherMisa2026.Application.Services
             }
 
             return errors;
+        }
+
+        public async Task<IEnumerable<Employee>> GetEmployeesByDeparmentCodeAsync(string deparmentCode)
+        {
+            return await _employeeRepository.GetEmployeesByDeparmentCode(deparmentCode);
+        }
+
+        public async Task<int> CountEmployeesByDepartmentCodeAsync(string deparmentCode)
+        {
+            return await _employeeRepository.CountEmployeesByDepartmentCode(deparmentCode);
         }
     }
 }
