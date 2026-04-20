@@ -5,6 +5,7 @@ using FresherMisa2026.Entities.Enums;
 using FresherMisa2026.Entities.Extensions;
 using System.Collections.Concurrent;
 using System.Reflection;
+using FresherMisa2026.Entities.Exception;
 
 namespace FresherMisa2026.Application.Services
 {
@@ -201,8 +202,16 @@ namespace FresherMisa2026.Application.Services
             //2. Sử lí lỗi tương ứng
             if (errors.Count == 0)
             {
-                var result = await _baseRepository.InsertAsync(entity);
-                return CreateSuccessResponse(result);
+                try
+                {
+                    var result = await _baseRepository.InsertAsync(entity);
+                    return CreateSuccessResponse(result);
+                }
+                catch (DuplicateKeyException dk)
+                {
+                    // Return a friendly message to user and preserve dev message
+                    return CreateErrorResponse(ResponseCode.BadRequest, dk.Message, dk.Message);
+                }
             }
 
             return CreateErrorResponse(

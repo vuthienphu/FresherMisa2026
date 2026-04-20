@@ -13,6 +13,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Caching.Memory;
 using System.Linq;
+using FresherMisa2026.Entities.Exception;
 
 namespace FresherMisa2026.Infrastructure.Repositories
 {
@@ -51,7 +52,7 @@ namespace FresherMisa2026.Infrastructure.Repositories
          
         }
 
-        
+
         protected async Task<IDbConnection> OpenConnectionAsync()
         {
             var connection = new MySqlConnection(_connectionString);
@@ -247,6 +248,38 @@ namespace FresherMisa2026.Infrastructure.Repositories
                     transaction.Commit();
                     ClearCache();
                 }
+                catch (MySqlException mex)
+                {
+                    // Rollback and translate duplicate-key errors into a domain exception with a friendly message
+                    transaction.Rollback();
+
+                    if (!string.IsNullOrEmpty(mex.Message) && mex.Message.Contains("Duplicate entry", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        string? columnName = null;
+                        var properties = entity.GetType().GetProperties();
+                        foreach (var prop in properties)
+                        {
+                            // try to find a property name mentioned in the DB error text (best-effort)
+                            if (!string.IsNullOrEmpty(prop.Name) && mex.Message.Contains(prop.Name, StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                columnName = prop.Name;
+                                break;
+                            }
+                        }
+
+                        string userMessage = "Duplicate key error";
+                        if (!string.IsNullOrEmpty(columnName))
+                        {
+                            var displayName = _modelType.GetColumnDisplayName(columnName);
+                            userMessage = $"{displayName} đã tồn tại";
+                        }
+
+                        throw new DuplicateKeyException(userMessage, columnName);
+                    }
+
+                    // not a duplicate key error -> rethrow
+                    throw;
+                }
                 catch
                 {
                     transaction.Rollback();
@@ -327,7 +360,7 @@ namespace FresherMisa2026.Infrastructure.Repositories
             parameters.Add("@v_sort", sort);
             parameters.Add("@v_searchFields", JsonSerializer.Serialize(searchFields));
 
-            using var reader = await connection.QueryMultipleAsync(
+            using var reader = await connection.QueryMultipleAsync  (
                 new CommandDefinition(store, parameters, commandType: CommandType.StoredProcedure));
 
             data = (await reader.ReadAsync<TEntity>()).ToList();
