@@ -2,6 +2,7 @@ using FresherMisa2026.Application.Interfaces.Services;
 using FresherMisa2026.Entities;
 using FresherMisa2026.Entities.Employee;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace FresherMisa2026.WebAPI.Controllers
 {
@@ -54,13 +55,15 @@ namespace FresherMisa2026.WebAPI.Controllers
             decimal? salaryFrom,
             decimal? salaryTo,
             DateTime? hireDateFrom,
-            DateTime? hireDateTo
+            DateTime? hireDateTo,
+            int pageSize = 10,
+            int pageIndex = 1
             )
         {
             var response = new ServiceResponse();
 
             response.Data = await _employeeService
-                .FilterEmployeesAsync(departmentId, positionId, gender, salaryFrom, salaryTo, hireDateFrom, hireDateTo);
+                .FilterEmployeesAsync(departmentId, positionId, gender, salaryFrom, salaryTo, hireDateFrom, hireDateTo, pageSize, pageIndex);
 
             response.IsSuccess = true;
 

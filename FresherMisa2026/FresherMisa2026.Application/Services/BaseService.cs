@@ -273,7 +273,9 @@ namespace FresherMisa2026.Application.Services
             var response = new PagingResponse<TEntity>
             {
                 Total = total,
-                Data = data.ToList()
+                Data = data.ToList(),
+                PageSize = pagingRequest.PageSize,
+                PageIndex = pagingRequest.PageIndex
             };
 
             return CreateSuccessResponse(response);

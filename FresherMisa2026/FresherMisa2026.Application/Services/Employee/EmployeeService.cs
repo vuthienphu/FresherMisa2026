@@ -7,6 +7,7 @@ using FresherMisa2026.Entities.Position;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace FresherMisa2026.Application.Services
 {
@@ -41,9 +42,9 @@ namespace FresherMisa2026.Application.Services
             return await _employeeRepository.GetEmployeesByPositionId(positionId);
         }
 
-        public async Task<IEnumerable<Employee>> FilterEmployeesAsync(Guid? departmentId, Guid? positionId, string? gender, decimal? salaryFrom, decimal? salaryTo, DateTime? hireDateFrom, DateTime? hireDateTo)
+        public async Task<PagingResponse<Employee>> FilterEmployeesAsync(Guid? departmentId, Guid? positionId, string? gender, decimal? salaryFrom, decimal? salaryTo, DateTime? hireDateFrom, DateTime? hireDateTo, int pageSize, int pageIndex)
         {
-            return await _employeeRepository.FilterEmployees(departmentId, positionId, gender,salaryFrom,salaryTo,hireDateFrom,hireDateTo);
+            return await _employeeRepository.FilterEmployees(departmentId, positionId, gender, salaryFrom, salaryTo, hireDateFrom, hireDateTo, pageSize, pageIndex);
         }
 
         protected override List<ValidationError> ValidateCustom(Employee employee)

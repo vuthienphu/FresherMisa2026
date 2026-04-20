@@ -1,14 +1,15 @@
 using Dapper;
+using Dapper;
 using FresherMisa2026.Application.Extensions;
 using FresherMisa2026.Application.Interfaces.Repositories;
+using FresherMisa2026.Entities;
 using FresherMisa2026.Entities.Employee;
 using FresherMisa2026.Entities.Position;
-using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
 using Microsoft.Extensions.Caching.Memory;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using System;
-using Dapper;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FresherMisa2026.Infrastructure.Repositories
 {
@@ -52,23 +53,46 @@ namespace FresherMisa2026.Infrastructure.Repositories
             return await connection.QueryAsync<Employee>(query, param, commandType: System.Data.CommandType.Text);
         }
 
-        public async Task<IEnumerable<Employee>> FilterEmployees(Guid? departmentId, Guid? positionId, string? gender, decimal? salaryFrom, decimal? salaryTo,DateTime? hireDateFrom,DateTime? hireDateTo)
+        public async Task<PagingResponse<Employee>> FilterEmployees(Guid? departmentId, Guid? positionId, string? gender, decimal? salaryFrom, decimal? salaryTo, DateTime? hireDateFrom, DateTime? hireDateTo, int pageSize, int pageIndex)
         {
-            string query = SQLExtension.GetQuery("Employee.Filter");
+            string baseQuery = SQLExtension.GetQuery("Employee.Filter");
 
             var param = new Dictionary<string, object>
-    {
-        {"@DepartmentID", departmentId},
-        {"@PositionID", positionId},
-        {"@Gender", gender},
-         {"@SalaryFrom", salaryFrom},
-        {"@SalaryTo", salaryTo},
-        {"@HireDateFrom", hireDateFrom},
-        {"@HireDateTo", hireDateTo}
-    };
+            {
+                {"@DepartmentID", departmentId},
+                {"@PositionID", positionId},
+                {"@Gender", gender},
+                {"@SalaryFrom", salaryFrom},
+                {"@SalaryTo", salaryTo},
+                {"@HireDateFrom", hireDateFrom},
+                {"@HireDateTo", hireDateTo}
+            };
 
             using var connection = await OpenConnectionAsync();
-            return await connection.QueryAsync<Employee>(query, param, commandType: System.Data.CommandType.Text);
+
+          
+            var countQuery = $"SELECT COUNT(*) FROM ({baseQuery}) AS countTable";
+            var total = await connection.ExecuteScalarAsync<long>(countQuery, param, commandType: System.Data.CommandType.Text);
+
+            
+            if (pageSize <= 0) pageSize = 10;
+            if (pageIndex <= 0) pageIndex = 1;
+            var offset = (pageIndex - 1) * pageSize;
+
+           
+            var dataQuery = baseQuery + " ORDER BY EmployeeID LIMIT @Offset, @PageSize";
+            param.Add("@Offset", offset);
+            param.Add("@PageSize", pageSize);
+
+            var data = await connection.QueryAsync<Employee>(dataQuery, param, commandType: System.Data.CommandType.Text);
+
+            return new PagingResponse<Employee>
+            {
+                Total = total,
+                Data = data.ToList(),
+                PageSize = pageSize,
+                PageIndex = pageIndex
+            };
         }
 
       
@@ -93,7 +117,7 @@ namespace FresherMisa2026.Infrastructure.Repositories
     };
 
             using var connection = await OpenConnectionAsync();
-            return await connection.ExecuteScalarAsync<int>(query, param, commandType: System.Data.CommandType.Text);
+            return await connection.ExecuteScalarAsync<int>(query, param, commandType: System.Data.CommandType.Text);   
         }
     }
 }
