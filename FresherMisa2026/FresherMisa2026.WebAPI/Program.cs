@@ -14,6 +14,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddMemoryCache();
+
+// Add memory cache (used by BaseRepository for caching GetEntities / GetEntityById)
+builder.Services.AddMemoryCache();
+
 //DI
 builder.Services.AddApplicationDI();
 builder.Services.AddInfrastructure();
